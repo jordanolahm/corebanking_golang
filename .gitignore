@@ -1,0 +1,28 @@
+# Binaries
+/bin/
+/build/
+/*.exe
+/*.exe~
+/*.dll
+/*.so
+/*.dylib
+
+# Test binary
+/*.test
+
+# Go modules
+/go.sum
+
+# IDE / Editor configs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+/log/
+/*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
