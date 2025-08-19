@@ -21,7 +21,6 @@ func NewAccountController(service *service.AccountService, errHandler utils.Erro
 	}
 }
 
-// RegisterRoutes registra as rotas no mux
 func (c *AccountController) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/accounts/", c.RouteAccount)
 	mux.HandleFunc("/api/accounts/balance", c.GetBalance)

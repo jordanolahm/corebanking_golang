@@ -11,18 +11,15 @@ import (
 	"time"
 )
 
-// TransactionController estrutura para lidar com transações
 type TransactionController struct {
 	Service      *service.TransactionService
 	ErrorHandler utils.ErrorHandler
 }
 
-// NewTransactionController cria um novo TransactionController
 func NewTransactionController(service *service.TransactionService, errHandler utils.ErrorHandler) *TransactionController {
 	return &TransactionController{Service: service, ErrorHandler: errHandler}
 }
 
-// RegisterRoutes registra as rotas no mux
 func (c *TransactionController) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/transactions/", c.RouteTransaction)
 	mux.HandleFunc("/api/transactions/today", c.GetTransactionsToday)
@@ -32,7 +29,6 @@ func (c *TransactionController) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/transactions", c.CreateTransaction)
 }
 
-// routeTransaction trata GET /api/transactions/{transactionId}
 func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		utils.HandleHTTPError(w, nil, "Failed to instance method RESTful.", c.ErrorHandler)
@@ -54,7 +50,6 @@ func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.
 	c.GetTransactionByID(w, r, id)
 }
 
-// CreateTransaction cria uma nova transação
 func (c *TransactionController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		utils.HandleHTTPError(w, nil, "Failed to instance method RESTful.", c.ErrorHandler)
@@ -76,7 +71,6 @@ func (c *TransactionController) CreateTransaction(w http.ResponseWriter, r *http
 	respondJSON(w, http.StatusCreated, transaction)
 }
 
-// HandleTransactionEvent processa eventos de depósito, saque ou transferência
 func (c *TransactionController) HandleTransactionEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		utils.HandleHTTPError(w, nil, "Failed to instance method RESTful.", c.ErrorHandler)
@@ -98,7 +92,6 @@ func (c *TransactionController) HandleTransactionEvent(w http.ResponseWriter, r 
 	respondJSON(w, http.StatusCreated, result)
 }
 
-// GetTransactionByID retorna transação pelo ID
 func (c *TransactionController) GetTransactionByID(w http.ResponseWriter, r *http.Request, id int64) {
 	transaction, err := c.Service.GetTransactionByID(id)
 	if err != nil {
@@ -109,13 +102,11 @@ func (c *TransactionController) GetTransactionByID(w http.ResponseWriter, r *htt
 	respondJSON(w, http.StatusOK, transaction)
 }
 
-// GetTransactionsToday retorna transações do dia
 func (c *TransactionController) GetTransactionsToday(w http.ResponseWriter, r *http.Request) {
 	transactions := c.Service.GetTransactionsToday()
 	respondJSON(w, http.StatusOK, transactions)
 }
 
-// GetTransactionsInRange retorna transações em um intervalo de datas
 func (c *TransactionController) GetTransactionsInRange(w http.ResponseWriter, r *http.Request) {
 	beginStr := r.URL.Query().Get("begin")
 	endStr := r.URL.Query().Get("end")
@@ -141,7 +132,6 @@ func (c *TransactionController) GetTransactionsInRange(w http.ResponseWriter, r 
 	respondJSON(w, http.StatusOK, transactions)
 }
 
-// GetTransactionsByType retorna transações por tipo
 func (c *TransactionController) GetTransactionsByType(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	if len(parts) != 4 { // ["api","transactions","type","{operationTypeId}"]

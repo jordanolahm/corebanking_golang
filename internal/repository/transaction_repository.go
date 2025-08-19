@@ -17,7 +17,6 @@ func NewTransactionRepository() *TransactionRepository {
 	}
 }
 
-// Save adiciona uma transação à lista
 func (r *TransactionRepository) Save(transaction *domain.Transaction) *domain.Transaction {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -25,7 +24,6 @@ func (r *TransactionRepository) Save(transaction *domain.Transaction) *domain.Tr
 	return transaction
 }
 
-// FindByID retorna uma transação pelo ID
 func (r *TransactionRepository) FindByID(transactionID int64) *domain.Transaction {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -37,7 +35,6 @@ func (r *TransactionRepository) FindByID(transactionID int64) *domain.Transactio
 	return nil
 }
 
-// FindAllOperationTypeByID retorna todas as transações de um tipo específico
 func (r *TransactionRepository) FindAllOperationTypeByID(operationTypeID int) []*domain.Transaction {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -50,7 +47,6 @@ func (r *TransactionRepository) FindAllOperationTypeByID(operationTypeID int) []
 	return result
 }
 
-// FindAllTransactionsBetweenDate retorna transações dentro de um intervalo
 func (r *TransactionRepository) FindAllTransactionsBetweenDate(begin, end time.Time) []*domain.Transaction {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -64,7 +60,6 @@ func (r *TransactionRepository) FindAllTransactionsBetweenDate(begin, end time.T
 	return result
 }
 
-// FindAllTransactionOnDate retorna transações de um dia específico
 func (r *TransactionRepository) FindAllTransactionOnDate(date time.Time) []*domain.Transaction {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -79,14 +74,12 @@ func (r *TransactionRepository) FindAllTransactionOnDate(date time.Time) []*doma
 	return result
 }
 
-// FindAll retorna todas as transações
 func (r *TransactionRepository) FindAll() []*domain.Transaction {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.transactions
 }
 
-// Reset limpa todas as transações
 func (r *TransactionRepository) Reset() {
 	r.mu.Lock()
 	defer r.mu.Unlock()

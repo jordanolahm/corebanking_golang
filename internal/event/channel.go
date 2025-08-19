@@ -15,7 +15,6 @@ type LogChannel struct {
 	wg      sync.WaitGroup
 }
 
-// Inicializa o channel e abre o arquivo de log
 func NewLogChannel(filePath string, bufferSize int) (*LogChannel, error) {
 	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -33,7 +32,6 @@ func NewLogChannel(filePath string, bufferSize int) (*LogChannel, error) {
 	return lc, nil
 }
 
-// Consome o channel, insere no arquivo
 func (lc *LogChannel) StartWorker() {
 	defer lc.wg.Done()
 	for logEvent := range lc.channel {
@@ -41,12 +39,10 @@ func (lc *LogChannel) StartWorker() {
 	}
 }
 
-// Envia evento channel
 func (lc *LogChannel) Send(message string) {
 	lc.channel <- LogEvent{Message: message}
 }
 
-// Fecha o channel
 func (lc *LogChannel) Close() error {
 	close(lc.channel)
 	lc.wg.Wait()
