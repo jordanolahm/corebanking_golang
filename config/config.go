@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 )
 
@@ -22,7 +21,6 @@ func LoadConfig() *Config {
 		Version:  getEnv("VERSION", "v1"),
 	}
 
-	log.Printf("Config loaded: %+v\n", cfg)
 	return cfg
 }
 
