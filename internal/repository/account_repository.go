@@ -16,7 +16,6 @@ func NewAccountRepository() *AccountRepository {
 	}
 }
 
-// FindById retorna a conta e um boolean indicando se ela existe
 func (r *AccountRepository) FindById(id string) (*domain.Account, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -25,7 +24,6 @@ func (r *AccountRepository) FindById(id string) (*domain.Account, bool) {
 	return account, exists
 }
 
-// Save insere ou atualiza uma conta
 func (r *AccountRepository) Save(account *domain.Account) *domain.Account {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -34,7 +32,6 @@ func (r *AccountRepository) Save(account *domain.Account) *domain.Account {
 	return account
 }
 
-// Reset limpa o repositório
 func (r *AccountRepository) Reset() {
 	r.mu.Lock()
 	defer r.mu.Unlock()

@@ -12,26 +12,23 @@ import (
 )
 
 func main() {
-	// Carregar configuração
 	cfg := config.LoadConfig()
 
-	// Cria pasta de log se nao existir
-	if err := os.MkdirAll("log", os.ModePerm); err != nil {
-		panic("Failed to create log directory: " + err.Error())
-	}
-
-	// Inicializar canal de logs
 	logChannel, err := event.NewLogChannel("log/transactions.log", 100)
 	if err != nil {
 		panic("Failed to initialize log channel: " + err.Error())
 	}
-	// Garantir fechamento do arquivo e do worker ao final
 	defer logChannel.Close()
+
+	logChannel.Send("[INFO] Apllication has been started.")
+
+	if err := os.MkdirAll("log", os.ModePerm); err != nil {
+		panic("Failed to create log directory: " + err.Error())
+	}
 
 	errorWorker := worker.NewErrorWorker(logChannel)
 	logChannel.Send("[INFO] Log worker started")
 
-	// Inicializar repositórios
 	accountRepo := repository.NewAccountRepository()
 	transactionRepo := repository.NewTransactionRepository()
 	logChannel.Send("[INFO] Repositories initialized")
@@ -46,7 +43,6 @@ func main() {
 	transactionController := controller.NewTransactionController(transactionService, errorWorker)
 	logChannel.Send("[INFO] Controllers initialized")
 
-	// Prefixo da API versionada
 	apiPrefix := "/api/" + cfg.Version
 
 	// Configurar roteador HTTP

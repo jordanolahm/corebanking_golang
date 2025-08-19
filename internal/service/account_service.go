@@ -10,14 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-// AccountService gerencia contas e limites
 type AccountService struct {
 	accountRepo       *repository.AccountRepository
 	documentToAccount map[string]string
 	mu                sync.RWMutex
 }
 
-// NewAccountService cria uma nova instância do service
 func NewAccountService(accountRepo *repository.AccountRepository) *AccountService {
 	return &AccountService{
 		accountRepo:       accountRepo,
@@ -25,7 +23,6 @@ func NewAccountService(accountRepo *repository.AccountRepository) *AccountServic
 	}
 }
 
-// CreateAccount cria uma nova conta se o documento ainda não existir
 func (s *AccountService) CreateAccount(documentNumber string) (*dto.AccountResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -49,7 +46,6 @@ func (s *AccountService) CreateAccount(documentNumber string) (*dto.AccountRespo
 	}, nil
 }
 
-// GetAccount retorna uma conta pelo ID
 func (s *AccountService) GetAccount(accountID string) (*dto.AccountResponse, error) {
 	account, exists := s.accountRepo.FindById(accountID)
 	if !exists {
@@ -73,7 +69,6 @@ func (s *AccountService) GetAccount(accountID string) (*dto.AccountResponse, err
 	}, nil
 }
 
-// GetBalance retorna o saldo da conta
 func (s *AccountService) GetBalance(accountID string) (*dto.BalanceResponse, error) {
 	account, exists := s.accountRepo.FindById(accountID)
 	if !exists {
@@ -85,7 +80,6 @@ func (s *AccountService) GetBalance(accountID string) (*dto.BalanceResponse, err
 	}, nil
 }
 
-// ConfigOverdraft define o limite de cheque especial da conta
 func (s *AccountService) ConfigOverdraft(accountID string, limit int64) error {
 	account, exists := s.accountRepo.FindById(accountID)
 	if !exists {
@@ -97,7 +91,6 @@ func (s *AccountService) ConfigOverdraft(accountID string, limit int64) error {
 	return nil
 }
 
-// Reset limpa todas as contas e documentos
 func (s *AccountService) Reset() {
 	s.accountRepo.Reset()
 

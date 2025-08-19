@@ -1,21 +1,18 @@
 package service
 
 import (
-	"fmt"
-	"time"
-
 	"corebanking/internal/domain"
 	"corebanking/internal/dto"
 	"corebanking/internal/repository"
+	"fmt"
+	"time"
 )
 
-// TransactionService gerencia transações
 type TransactionService struct {
 	transactionRepo *repository.TransactionRepository
 	accountRepo     *repository.AccountRepository
 }
 
-// NewTransactionService cria instância do service
 func NewTransactionService(trRepo *repository.TransactionRepository, acRepo *repository.AccountRepository) *TransactionService {
 	return &TransactionService{
 		transactionRepo: trRepo,
@@ -23,7 +20,6 @@ func NewTransactionService(trRepo *repository.TransactionRepository, acRepo *rep
 	}
 }
 
-// CreateTransaction cria uma nova transação
 func (s *TransactionService) CreateTransaction(req *dto.TransactionRequest) (*dto.TransactionResponse, error) {
 	account, exists := s.accountRepo.FindById(req.AccountID)
 	if !exists {
@@ -59,7 +55,6 @@ func (s *TransactionService) CreateTransaction(req *dto.TransactionRequest) (*dt
 	}, nil
 }
 
-// GetTransactionByID retorna uma transação pelo ID
 func (s *TransactionService) GetTransactionByID(transactionID int64) (*dto.TransactionResponse, error) {
 	transaction := s.transactionRepo.FindByID(transactionID)
 	if transaction == nil {
@@ -75,20 +70,17 @@ func (s *TransactionService) GetTransactionByID(transactionID int64) (*dto.Trans
 	}, nil
 }
 
-// GetTransactionsToday retorna transações do dia atual
 func (s *TransactionService) GetTransactionsToday() []*dto.TransactionResponse {
 	today := time.Now()
 	transactions := s.transactionRepo.FindAllTransactionOnDate(today)
 	return s.mapTransactionsToResponse(transactions)
 }
 
-// GetTransactionsInRange retorna transações dentro de um intervalo
 func (s *TransactionService) GetTransactionsInRange(begin, end time.Time) []*dto.TransactionResponse {
 	transactions := s.transactionRepo.FindAllTransactionsBetweenDate(begin, end)
 	return s.mapTransactionsToResponse(transactions)
 }
 
-// GetTransactionsByType retorna transações por tipo
 func (s *TransactionService) GetTransactionsByType(operationTypeID int) []*dto.TransactionResponse {
 	if operationTypeID < 1 || operationTypeID > 4 {
 		return nil
@@ -97,7 +89,6 @@ func (s *TransactionService) GetTransactionsByType(operationTypeID int) []*dto.T
 	return s.mapTransactionsToResponse(transactions)
 }
 
-// Função auxiliar para normalizar o valor da transação
 func (s *TransactionService) normalizeAmount(operationTypeID int, amount int64) int64 {
 	switch operationTypeID {
 	case 1, 2, 3:
@@ -157,29 +148,24 @@ func (s *TransactionService) handleWithdraw(req *dto.EventRequest) (map[string]*
 }
 
 func (s *TransactionService) handleTransfer(req *dto.EventRequest) (map[string]*domain.Account, error) {
-	// Recupera a conta de origem
 	origin, exists := s.accountRepo.FindById(req.Origin)
 	if !exists {
 		return nil, fmt.Errorf("origin account not found")
 	}
 
-	// Recupera a conta de destino ou cria uma nova com saldo 0
 	destination, exists := s.accountRepo.FindById(req.Destination)
 	if !exists {
 		destination = domain.NewAccount(req.Destination, 0)
 	}
 
-	// Calcula saldo disponível da origem incluindo overdraft
 	available := origin.Balance + origin.OverdraftLimit
 	if available < req.Amount {
 		return nil, fmt.Errorf("insufficient funds, including overdraft")
 	}
 
-	// Atualiza saldos
 	origin.Balance -= req.Amount
 	destination.Balance += req.Amount
 
-	// Persiste contas atualizadas
 	s.accountRepo.Save(origin)
 	s.accountRepo.Save(destination)
 
@@ -189,7 +175,6 @@ func (s *TransactionService) handleTransfer(req *dto.EventRequest) (map[string]*
 	}, nil
 }
 
-// Mapear lista de domain.Transaction para TransactionResponse
 func (s *TransactionService) mapTransactionsToResponse(transactions []*domain.Transaction) []*dto.TransactionResponse {
 	result := make([]*dto.TransactionResponse, 0, len(transactions))
 	for _, t := range transactions {

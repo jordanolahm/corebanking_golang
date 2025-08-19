@@ -15,7 +15,6 @@ func NewErrorWorker(logChannel *event.LogChannel) *ErrorWorker {
 	return &ErrorWorker{logChannel: logChannel}
 }
 
-// Handle envia a mensagem de erro para o logChannel e implementa a interface de erro
 func (w *ErrorWorker) Handle(ctx context.Context, err error, message string) {
 
 	var logMsg string
@@ -27,13 +26,10 @@ func (w *ErrorWorker) Handle(ctx context.Context, err error, message string) {
 			message, time.Now().Format(time.RFC3339))
 	}
 
-	// Envia para o channel de forma não bloqueante
 	select {
 	case <-ctx.Done():
-		// Contexto cancelado, descarta log
 		return
 	default:
-		// Envia o log para o channel
 		w.logChannel.Send(logMsg)
 	}
 }
