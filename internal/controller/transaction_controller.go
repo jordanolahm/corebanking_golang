@@ -36,12 +36,12 @@ func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.
 	}
 
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(parts) != 3 { // ["api","transactions","{transactionId}"]
+	if len(parts) != 4 { // ["api", "v1", "transactions", "{transactionId}"]
 		utils.HandleHTTPError(w, nil, "Failed to split path.", c.ErrorHandler)
 		return
 	}
 
-	id, err := strconv.ParseInt(parts[2], 10, 64)
+	id, err := strconv.ParseInt(parts[3], 10, 64)
 	if err != nil {
 		utils.HandleHTTPError(w, nil, "Failed to parse string to int.", c.ErrorHandler)
 		return

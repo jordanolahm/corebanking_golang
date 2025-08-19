@@ -36,12 +36,12 @@ func (c *AccountController) RouteAccount(w http.ResponseWriter, r *http.Request)
 	}
 
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(parts) != 3 {
+	if len(parts) != 4 { // /api/v1/accounts/{id}
 		utils.HandleHTTPError(w, nil, "Failed to split path.", c.ErrorHandler)
 		return
 	}
 
-	accountID := parts[2]
+	accountID := parts[3]
 	c.GetAccount(w, r, accountID)
 }
 

@@ -47,7 +47,6 @@ func main() {
 
 	// Configurar roteador HTTP
 	mux := http.NewServeMux()
-
 	accountController.RegisterRoutes(mux, apiPrefix)
 	transactionController.RegisterRoutes(mux, apiPrefix)
 
