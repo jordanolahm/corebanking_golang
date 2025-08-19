@@ -47,21 +47,8 @@ func main() {
 
 	// Configurar roteador HTTP
 	mux := http.NewServeMux()
-
-	// Rotas de accounts
-	mux.HandleFunc(apiPrefix+"/accounts", accountController.CreateAccount)
-	mux.HandleFunc(apiPrefix+"/accounts/", accountController.RouteAccount)
-	mux.HandleFunc(apiPrefix+"/accounts/balance", accountController.GetBalance)
-	mux.HandleFunc(apiPrefix+"/accounts/overdraft", accountController.SetOverdraft)
-	mux.HandleFunc(apiPrefix+"/accounts/reset", accountController.Reset)
-
-	// Rotas de transactions
-	mux.HandleFunc(apiPrefix+"/transactions", transactionController.CreateTransaction)
-	mux.HandleFunc(apiPrefix+"/transactions/event", transactionController.HandleTransactionEvent)
-	mux.HandleFunc(apiPrefix+"/transactions/today", transactionController.GetTransactionsToday)
-	mux.HandleFunc(apiPrefix+"/transactions/range", transactionController.GetTransactionsInRange)
-	mux.HandleFunc(apiPrefix+"/transactions/type/", transactionController.GetTransactionsByType)
-	mux.HandleFunc(apiPrefix+"/transactions/", transactionController.RouteTransaction)
+	accountController.RegisterRoutes(mux, apiPrefix)
+	transactionController.RegisterRoutes(mux, apiPrefix)
 
 	// Iniciar servidor
 	serverAddr := ":" + cfg.Port

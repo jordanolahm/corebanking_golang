@@ -20,13 +20,14 @@ func NewTransactionController(service *service.TransactionService, errHandler ut
 	return &TransactionController{Service: service, ErrorHandler: errHandler}
 }
 
-func (c *TransactionController) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/api/transactions/", c.RouteTransaction)
-	mux.HandleFunc("/api/transactions/today", c.GetTransactionsToday)
-	mux.HandleFunc("/api/transactions/range", c.GetTransactionsInRange)
-	mux.HandleFunc("/api/transactions/type/", c.GetTransactionsByType)
-	mux.HandleFunc("/api/transactions/event", c.HandleTransactionEvent)
-	mux.HandleFunc("/api/transactions", c.CreateTransaction)
+func (c *TransactionController) RegisterRoutes(mux *http.ServeMux, apiPrefix string) {
+	mux.HandleFunc(apiPrefix+"/transactions", c.CreateTransaction)
+	mux.HandleFunc(apiPrefix+"/transactions/event", c.HandleTransactionEvent)
+	mux.HandleFunc(apiPrefix+"/transactions/today", c.GetTransactionsToday)
+	mux.HandleFunc(apiPrefix+"/transactions/range", c.GetTransactionsInRange)
+	mux.HandleFunc(apiPrefix+"/transactions/type/", c.GetTransactionsByType)
+	mux.HandleFunc(apiPrefix+"/transactions/", c.RouteTransaction)
+	mux.HandleFunc(apiPrefix+"/transactions/all", c.GetAllTransactions)
 }
 
 func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.Request) {
@@ -36,12 +37,12 @@ func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.
 	}
 
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(parts) != 3 { // ["api","transactions","{transactionId}"]
+	if len(parts) != 4 { // ["api", "v1", "transactions", "{transactionId}"]
 		utils.HandleHTTPError(w, nil, "Failed to split path.", c.ErrorHandler)
 		return
 	}
 
-	id, err := strconv.ParseInt(parts[2], 10, 64)
+	id, err := strconv.ParseInt(parts[3], 10, 64)
 	if err != nil {
 		utils.HandleHTTPError(w, nil, "Failed to parse string to int.", c.ErrorHandler)
 		return
@@ -134,17 +135,31 @@ func (c *TransactionController) GetTransactionsInRange(w http.ResponseWriter, r 
 
 func (c *TransactionController) GetTransactionsByType(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(parts) != 4 { // ["api","transactions","type","{operationTypeId}"]
+	if len(parts) != 5 { // ["api","transactions","type","{operationTypeId}"]
 		utils.HandleHTTPError(w, nil, "Failed to split path.", c.ErrorHandler)
 		return
 	}
 
-	typeID, err := strconv.Atoi(parts[3])
+	typeID, err := strconv.Atoi(parts[4])
 	if err != nil {
 		utils.HandleHTTPError(w, nil, "Failed parse data in transactionByType.", c.ErrorHandler)
 		return
 	}
 
 	transactions := c.Service.GetTransactionsByType(typeID)
+	respondJSON(w, http.StatusOK, transactions)
+}
+
+func (c *TransactionController) GetAllTransactions(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.HandleHTTPError(w, nil, "Failed to instance method RESTful.", c.ErrorHandler)
+		return
+	}
+
+	transactions := c.Service.GetAllTransactions()
+	if len(transactions) == 0 {
+		utils.HandleHTTPError(w, nil, "No transactions found.", c.ErrorHandler)
+		return
+	}
 	respondJSON(w, http.StatusOK, transactions)
 }

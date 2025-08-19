@@ -21,12 +21,12 @@ func NewAccountController(service *service.AccountService, errHandler utils.Erro
 	}
 }
 
-func (c *AccountController) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/api/accounts/", c.RouteAccount)
-	mux.HandleFunc("/api/accounts/balance", c.GetBalance)
-	mux.HandleFunc("/api/accounts", c.CreateAccount)
-	mux.HandleFunc("/api/accounts/overdraft", c.SetOverdraft)
-	mux.HandleFunc("/api/accounts/reset", c.Reset)
+func (c *AccountController) RegisterRoutes(mux *http.ServeMux, apiPrefix string) {
+	mux.HandleFunc(apiPrefix+"/accounts", c.CreateAccount)
+	mux.HandleFunc(apiPrefix+"/accounts/", c.RouteAccount)
+	mux.HandleFunc(apiPrefix+"/accounts/balance", c.GetBalance)
+	mux.HandleFunc(apiPrefix+"/accounts/overdraft", c.SetOverdraft)
+	mux.HandleFunc(apiPrefix+"/accounts/reset", c.Reset)
 }
 
 func (c *AccountController) RouteAccount(w http.ResponseWriter, r *http.Request) {
@@ -36,12 +36,12 @@ func (c *AccountController) RouteAccount(w http.ResponseWriter, r *http.Request)
 	}
 
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(parts) != 3 {
+	if len(parts) != 4 { // /api/v1/accounts/{id}
 		utils.HandleHTTPError(w, nil, "Failed to split path.", c.ErrorHandler)
 		return
 	}
 
-	accountID := parts[2]
+	accountID := parts[3]
 	c.GetAccount(w, r, accountID)
 }
 
@@ -118,7 +118,12 @@ func (c *AccountController) Reset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.Service.Reset()
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	respondJSON(w, http.StatusOK, map[string]string{
+		"message": "Sistema resetado com sucesso",
+	})
 }
 
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
