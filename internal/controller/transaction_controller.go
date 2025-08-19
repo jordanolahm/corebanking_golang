@@ -134,12 +134,12 @@ func (c *TransactionController) GetTransactionsInRange(w http.ResponseWriter, r 
 
 func (c *TransactionController) GetTransactionsByType(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(parts) != 4 { // ["api","transactions","type","{operationTypeId}"]
+	if len(parts) != 5 { // ["api","transactions","type","{operationTypeId}"]
 		utils.HandleHTTPError(w, nil, "Failed to split path.", c.ErrorHandler)
 		return
 	}
 
-	typeID, err := strconv.Atoi(parts[3])
+	typeID, err := strconv.Atoi(parts[4])
 	if err != nil {
 		utils.HandleHTTPError(w, nil, "Failed parse data in transactionByType.", c.ErrorHandler)
 		return

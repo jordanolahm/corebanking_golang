@@ -118,7 +118,12 @@ func (c *AccountController) Reset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.Service.Reset()
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	respondJSON(w, http.StatusOK, map[string]string{
+		"message": "Sistema resetado com sucesso",
+	})
 }
 
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
