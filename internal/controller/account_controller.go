@@ -109,6 +109,11 @@ func (c *AccountController) SetOverdraft(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.WriteHeader(http.StatusOK)
+	if http.StatusOK == 200 {
+		respondJSON(w, http.StatusOK, map[string]string{
+			"message": "Overdraft limit was applied.",
+		})
+	}
 }
 
 func (c *AccountController) Reset(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +127,7 @@ func (c *AccountController) Reset(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	respondJSON(w, http.StatusOK, map[string]string{
-		"message": "Sistema resetado com sucesso",
+		"message": "System has been reseted.",
 	})
 }
 
