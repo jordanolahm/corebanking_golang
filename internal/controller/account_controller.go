@@ -21,12 +21,12 @@ func NewAccountController(service *service.AccountService, errHandler utils.Erro
 	}
 }
 
-func (c *AccountController) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/api/accounts/", c.RouteAccount)
-	mux.HandleFunc("/api/accounts/balance", c.GetBalance)
-	mux.HandleFunc("/api/accounts", c.CreateAccount)
-	mux.HandleFunc("/api/accounts/overdraft", c.SetOverdraft)
-	mux.HandleFunc("/api/accounts/reset", c.Reset)
+func (c *AccountController) RegisterRoutes(mux *http.ServeMux, apiPrefix string) {
+	mux.HandleFunc(apiPrefix+"/accounts", c.CreateAccount)
+	mux.HandleFunc(apiPrefix+"/accounts/", c.RouteAccount)
+	mux.HandleFunc(apiPrefix+"/accounts/balance", c.GetBalance)
+	mux.HandleFunc(apiPrefix+"/accounts/overdraft", c.SetOverdraft)
+	mux.HandleFunc(apiPrefix+"/accounts/reset", c.Reset)
 }
 
 func (c *AccountController) RouteAccount(w http.ResponseWriter, r *http.Request) {

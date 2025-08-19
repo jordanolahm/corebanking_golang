@@ -158,3 +158,91 @@ go build -o corebanking
 
 # Run the server
 go run main.go
+
+
+##  Routine to search 
+ - 1. Reset (opcional)
+
+Endpoint: POST /api/accounts/reset
+
+description: clear previous state, to start with zero.
+
+- 2. Create account
+
+Endpoint: POST /api/accounts
+
+input: { "documentNumber": "12345678900" }
+
+output: accountId gerado.
+👉 Este accountId será usado em todos os próximos passos.
+
+- 3. Definir limite de cheque especial (opcional)
+
+Endpoint: POST /api/accounts/overdraft
+
+input: { "accountId": "123", "limit": 500.00 }
+
+description: configura limite de crédito da conta.
+
+- 4. Consultar dados da conta
+
+Endpoint: GET /api/accounts/{accountId}
+
+returned: accountId, documentNumber.
+👉 Serve para validar que a conta foi criada corretamente.
+
+- 5. Consultar saldo da conta
+
+Endpoint: GET /api/accounts/balance?account_id={accountId}
+
+returned: { "balance": 1500.00 } (por exemplo).
+
+- 6. Criar uma transação
+
+Existem dois jeitos diferentes na sua coleção:
+
+ - 6.1 Transação direta
+
+Endpoint: POST /api/transactions
+
+input: { "accountId": "123", "operationTypeId": 1, "amount": 100.00 }
+
+output: detalhes da transação.
+
+ - 6.2 Evento de transação (estilo Pix/depósito)
+
+Endpoint: POST /api/transactions/event
+
+input: { "type": "deposit", "destination": "123", "amount": 50.00 }
+
+output: nova versão do saldo da conta.
+
+
+- 7. Consultar transações
+
+description:  Depois de registrar transações, é possível buscá-las de várias formas:
+
+Por ID: GET /api/transactions/{transactionId}
+
+Do dia: GET /api/transactions/today
+
+Por período: GET /api/transactions/range?begin=...&end=...
+
+Por tipo: GET /api/transactions/type/{operationTypeId}
+
+
+##Flow to search
+
+> Reset Accounts (opcional)
+
+> Create Account
+
+> Set Overdraft (opcional)
+
+> Get Account by ID
+
+> Get Balance
+
+> Create Transaction ou Handle Transaction Event
+
+> Get Transaction(s) (por ID, day, interval, type)

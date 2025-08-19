@@ -20,13 +20,13 @@ func NewTransactionController(service *service.TransactionService, errHandler ut
 	return &TransactionController{Service: service, ErrorHandler: errHandler}
 }
 
-func (c *TransactionController) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/api/transactions/", c.RouteTransaction)
-	mux.HandleFunc("/api/transactions/today", c.GetTransactionsToday)
-	mux.HandleFunc("/api/transactions/range", c.GetTransactionsInRange)
-	mux.HandleFunc("/api/transactions/type/", c.GetTransactionsByType)
-	mux.HandleFunc("/api/transactions/event", c.HandleTransactionEvent)
-	mux.HandleFunc("/api/transactions", c.CreateTransaction)
+func (c *TransactionController) RegisterRoutes(mux *http.ServeMux, apiPrefix string) {
+	mux.HandleFunc(apiPrefix+"/transactions", c.CreateTransaction)
+	mux.HandleFunc(apiPrefix+"/transactions/event", c.HandleTransactionEvent)
+	mux.HandleFunc(apiPrefix+"/transactions/today", c.GetTransactionsToday)
+	mux.HandleFunc(apiPrefix+"/transactions/range", c.GetTransactionsInRange)
+	mux.HandleFunc(apiPrefix+"/transactions/type/", c.GetTransactionsByType)
+	mux.HandleFunc(apiPrefix+"/transactions/", c.RouteTransaction)
 }
 
 func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.Request) {
