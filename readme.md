@@ -136,6 +136,9 @@ go build -o corebanking
 # Run the project
 go run main.go
 
+# Run unit tests the project
+go test ./test/<name_file_test>
+
 ## Prerequisites
 - Go 1.20+
 - Terminal / curl
