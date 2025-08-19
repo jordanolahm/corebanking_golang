@@ -27,6 +27,7 @@ func (c *TransactionController) RegisterRoutes(mux *http.ServeMux, apiPrefix str
 	mux.HandleFunc(apiPrefix+"/transactions/range", c.GetTransactionsInRange)
 	mux.HandleFunc(apiPrefix+"/transactions/type/", c.GetTransactionsByType)
 	mux.HandleFunc(apiPrefix+"/transactions/", c.RouteTransaction)
+	mux.HandleFunc(apiPrefix+"/transactions/all", c.GetAllTransactions)
 }
 
 func (c *TransactionController) RouteTransaction(w http.ResponseWriter, r *http.Request) {
@@ -146,5 +147,19 @@ func (c *TransactionController) GetTransactionsByType(w http.ResponseWriter, r *
 	}
 
 	transactions := c.Service.GetTransactionsByType(typeID)
+	respondJSON(w, http.StatusOK, transactions)
+}
+
+func (c *TransactionController) GetAllTransactions(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.HandleHTTPError(w, nil, "Failed to instance method RESTful.", c.ErrorHandler)
+		return
+	}
+
+	transactions := c.Service.GetAllTransactions()
+	if len(transactions) == 0 {
+		utils.HandleHTTPError(w, nil, "No transactions found.", c.ErrorHandler)
+		return
+	}
 	respondJSON(w, http.StatusOK, transactions)
 }

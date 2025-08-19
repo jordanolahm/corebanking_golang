@@ -188,3 +188,7 @@ func (s *TransactionService) mapTransactionsToResponse(transactions []*domain.Tr
 	}
 	return result
 }
+
+func (s *TransactionService) GetAllTransactions() []*domain.Transaction {
+	return s.transactionRepo.FindAll()
+}
